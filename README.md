@@ -5,8 +5,8 @@ Cameron Group crawler bot
 
 * file format 
     ```yaml
-        username: flebbeEthan13@spamavert.net
-        password: KnightsRox
+        username: <username>
+        password: <password>
         account_id: 23
     ```
 
