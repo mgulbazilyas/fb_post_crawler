@@ -1,0 +1,6 @@
+wget
+requests
+pandas
+bs4
+selenium
+pyrebase
