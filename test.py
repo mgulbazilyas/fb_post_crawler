@@ -30,6 +30,35 @@ email_ending = ['.co.uk', '.com.au', '.es', '.ru', '.ge', '.fr', '.ph', '.gr', '
                 '.com']
 open2 = open
 
+firebaseConfig = {
+    'apiKey': "AIzaSyARUhOP1jwlYPURuevEMBYWADP2hwx2X8Q",
+    'authDomain': "admin-app-467bf.firebaseapp.com",
+    'databaseURL': "https://admin-app-467bf.firebaseio.com",
+    'projectId': "admin-app-467bf",
+    'storageBucket': "admin-app-467bf.appspot.com",
+    'messagingSenderId': "905924835344",
+    'appId': "1:905924835344:web:8c32cadfc547830c10f295",
+    'measurementId': "G-0NKJW34D2J"
+}
+firebase = pyrebase.initialize_app(firebaseConfig)
+db = firebase.database()
+
+
+def scriptHandler(message):
+    global runnerScript
+
+    global self
+
+    runnerScript = message['data']
+
+    if not runnerScript:
+        # self.quit()
+        exit()
+
+
+# runnerScript = db.child("scripts").child("runner_script").get()
+
+# runnerScript = runnerScript.val()
 with open('title.pickle', 'rb') as file:
     TITLES = pickle.load(file)
 
@@ -138,8 +167,6 @@ class Setup:
 
             print("ALready Logged in")
 
-            writeToFile("ALready Logged in")
-
             pass
 
         self.posts = posts
@@ -153,7 +180,12 @@ class Setup:
     def login(self):
 
         user, passwd = self.__user, self.__passwd
-
+        try:
+            time.sleep(2)
+            self.driver.find_element_by_css_selector('[data-testid="cookie-policy-dialog-accept-button"]').click()
+            time.sleep(1)
+        except:
+            pass
         self.driver.find_element_by_css_selector('[name="pass"]').click()
 
         self.driver.find_element_by_css_selector('[name="pass"]').send_keys(passwd)
@@ -244,7 +276,7 @@ class Setup:
             if email == '':    return False
 
             if email in self.blocked_emails:
-                # print(email, "blacklisted")
+                print(("email is in blacklist", text ))
 
                 return False
 
@@ -279,58 +311,6 @@ class Setup:
             pickle.dump(self.post_data, wb)
 
 
-def get_features(datasetFile: str):
-    paragraphs = []
-
-    for para in datasetFile.split('\n'):
-
-        if (len(para.strip()) > 0):
-            paragraphs.append(para.strip())
-
-    # Processing Paragraphs
-
-    drm = DRM(paragraphs, True, True)
-
-    questions = ['experience', 'size']
-
-    answers = []
-
-    for i in TITLES:
-
-        for j in TITLES[i]:
-
-            userQuery = j
-
-            pq = PQ(userQuery, True, False, True)
-
-            response = drm.query(pq)
-
-            if response != ' ': break
-
-        else:
-
-            continue
-
-        break
-
-    else:
-
-        i = ''
-
-    answers.append(i)
-
-    for i in questions:
-        userQuery = i
-
-        pq = PQ(userQuery, True, False, True)
-
-        # Get Response From Bot
-
-        response = drm.query(pq)
-
-        answers.append(response)
-
-    return answers
 
 
 # In[3]
@@ -352,51 +332,26 @@ def main():
     self = Setup(x, blocked_emails=blocked_emails)
 
 
-    groups = connection.get_groups(int(config.get('account_id')))
+    # groups = connection.get_groups(int(config.get('account_id')))
+    link = 'https://www.facebook.com/groups/855924918288669'
+    self.crawl_group(link)
 
-    if 1:
+    print("Get data Successful from\t", link)
 
-        for link in groups:
+    print(f'total = {len(self.post_data)}')
 
-            self.crawl_group(link)
+    for i in range(len(self.post_data)):
 
-            print("Get data Successful from\t", link)
+        data = self.post_data.pop()
 
-            writeToFile("Get data Succesfful from\t " + link)
+        success = connection.addData(data=data)
+
+        if success:
+            posted_data.append(success)
 
 
-            # df = pd.DataFrame(self.post_data)
 
-            # df.to_excel('data.xlsx', index=False)
 
-            # print("File Saved to Data.xlsx")
-
-            # df.to_json('data.json')
-
-            print(f'total = {len(self.post_data)}')
-
-            for i in range(len(self.post_data)):
-
-                data = self.post_data.pop()
-
-                success = connection.addData(data=data)
-
-                if success:
-                    posted_data.append(success)
-
-        print('ran for one time')
-
-        writeToFile('ran for one time')
-
-        time.sleep(150)
-
-        if runnerScript:
-            print("idhar aya")
-            db.child("scripts").update({"runner_script": False})
-            print("made it false")
-
-            db.child("scripts").update({"runner_script": True})
-            print("made it true")
 
 
 # %%
@@ -408,5 +363,5 @@ if __name__ == '__main__':
         with open('error.txt','a') as stream:
 
             stream.write(str(e))
-        self.driver.save_screenshot('error.png')
-        raise e
+        
+     
