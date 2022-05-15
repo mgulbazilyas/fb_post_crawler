@@ -3,4 +3,5 @@ requests
 pandas
 bs4
 selenium
-Pyrebase
+pyyaml
+webdriver-manager
